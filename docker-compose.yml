@@ -1,0 +1,13 @@
+services:
+  faultline-lab:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["/app/lab/compose-entrypoint.sh"]
+    environment:
+      NODE_ENV: lab
+    # The harness is process-local by design. An optional SQL service can be
+    # added by an application without changing the runtime boundary.
+    read_only: true
+    tmpfs:
+      - /tmp
