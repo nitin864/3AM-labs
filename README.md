@@ -37,8 +37,9 @@ test and demo commands are offline.
 ## What the gate proves
 
 `make test` first runs the locked workspace contract tests, compiles the shared
-TypeScript lab, and then runs both the small acceptance harness and the actual
-`LabRuntime` tests. It never starts Docker and never opens a network connection.
+TypeScript lab, and then runs the acceptance harness, actual `LabRuntime` tests,
+and the Task 5 end-to-end tests. It never starts Docker and never opens a
+network connection.
 
 The gate asserts all of the following with measured values, not labels from an
 agent:
@@ -55,6 +56,51 @@ agent:
 There are six Node test cases and eleven explicit gate checks. A failing check
 exits nonzero and prints its name. `make demo` prints the same evidence as a
 short, reviewable transcript and performs no repair or deployment action.
+
+The Task 5 integration run prints measured JSON for both
+`fault-4-timeout-mismatch` and `fault-5-oversell-race`, covering incident
+briefs, observed dependency graphs, three mock hypotheses, control/treatment/
+after experiments, and patch verification with anti-cheat checks.
+
+## Task 5 experiment-confirmed workflow
+
+The experiment-confirmed slice is deliberately split at the evidence boundary:
+
+1. `@faultline/incident-brief` computes measured rates, quantiles, errors,
+   affected services/traces, slow spans, fault markers, and evidence refs.
+2. `@faultline/graph-builder` builds observed service edges from trace parent
+   relationships and same-trace interactions. Graph edges are explicitly
+   marked observed and non-causal; they are not proof.
+3. `@faultline/agent-orchestrator` validates adapter responses with Zod and
+   records bounded retries, latency, token estimates, and output refs. The
+   offline mock always emits three hypotheses: two surface decoys and the
+   scenario mechanism when a known fault ID is present. A provider call is an
+   injected boundary; no vendor API is guessed here.
+4. `@faultline/replica-runner` runs exact workload manifests in fresh in-memory
+   replicas. Each experiment has control, treatment, and after phases, one
+   mutable fault variable, operation/time budgets, and cleanup receipts.
+5. `@faultline/experiment-engine` judges measured outcomes only. It returns
+   `supported` only when control is valid, treatment reproduces the predicted
+   symptom, and the after phase removes it; otherwise it returns `rejected` or
+   `inconclusive` according to the explicit rule.
+6. `@faultline/verifier` applies only constrained data-only patch operations in
+   disposable workspaces. It checks allowed paths, bounded diffs, build/tests,
+   replay recovery, and test-file/count/assertion integrity. It fails closed on
+   test deletion or weakening.
+
+Run only the Task 5 integration output with:
+
+```sh
+npm run build:lab
+npm run test --workspace @faultline/experiment-engine
+node --test tests/task5.integration.test.mjs
+```
+
+The measured integration fixture currently reports `supported` for both
+faults. This is a small synthetic demonstration, not evidence of production
+diagnostic accuracy. The oversell control intentionally reports ordinary
+out-of-stock errors when total demand exceeds stock; its healthy invariant is
+still preserved, while the faulted treatment drives `availableStock` negative.
 
 ## Lab runtime and fault catalog
 
