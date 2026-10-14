@@ -82,8 +82,8 @@ export class OrdersService {
       return { ok: false, durationMs, ...(inventoryResult.errorType === undefined ? {} : { errorType: inventoryResult.errorType }), attempts: 0, inventoryReserved: false, spanId };
     }
 
-    const maxAttempts = fault === "retry-storm" ? 4 : 1;
-    const timeoutMs = fault === "timeout-too-short" ? 3 : 20;
+    const maxAttempts = 1;
+    const timeoutMs = fault === "fault-4-timeout-mismatch" ? 150 : 250;
     let attempts = 0;
     let elapsed = 1 + inventoryResult.durationMs;
     let paymentResult: ReturnType<PaymentsService["charge"]> | undefined;
@@ -98,14 +98,14 @@ export class OrdersService {
         parentSpanId: inventoryResult.spanId,
       }, fault);
       elapsed += paymentResult.durationMs;
-      if (paymentResult.ok || (fault === "timeout-too-short" && paymentResult.durationMs > timeoutMs)) break;
+      if (paymentResult.ok || (fault === "fault-4-timeout-mismatch" && paymentResult.durationMs > timeoutMs)) break;
     }
 
-    const timedOut = fault === "timeout-too-short" && (paymentResult?.durationMs ?? 0) > timeoutMs;
+    const timedOut = fault === "fault-4-timeout-mismatch" && (paymentResult?.durationMs ?? 0) > timeoutMs;
     const succeeded = Boolean(paymentResult?.ok) && !timedOut;
     const errorType = succeeded ? undefined : timedOut ? "downstream_timeout" : paymentResult?.errorType;
     if (succeeded) this.inventory.sell(request.quantity);
-    if (fault !== "connection-pool-exhaustion") this.pool.release();
+    if (fault !== "fault-2-pool-exhaustion") this.pool.release();
     else this.pool.markLeak?.();
     const spanId = this.telemetry.span({
       traceId: request.traceId,

@@ -12,7 +12,7 @@ switch (command ?? "run") {
     console.log(JSON.stringify(runtime.health()));
     break;
   case "fault":
-    console.log(JSON.stringify(runtime.activateFault(argument ?? "connection-pool-exhaustion")));
+    console.log(JSON.stringify(runtime.activateFault(argument ?? "fault-4-timeout-mismatch")));
     break;
   case "scenarios":
     console.log(JSON.stringify(runtime.scenarios(), null, 2));
@@ -25,6 +25,20 @@ switch (command ?? "run") {
     console.log(JSON.stringify(result.run, null, 2));
     break;
   }
+  case "demo": {
+    runtime.start();
+    const baseline = runtime.runWorkload({ count: 20 }).run;
+    runtime.activateFault("fault-4-timeout-mismatch");
+    const faulted = runtime.runWorkload({ count: 20 }).run;
+    runtime.reset();
+    const recovered = runtime.runWorkload({ count: 20 }).run;
+    console.log(JSON.stringify({
+      baseline: baseline.metrics,
+      faulted: faulted.metrics,
+      recovered: recovered.metrics,
+    }, null, 2));
+    break;
+  }
   default:
-    throw new Error(`Usage: start | reset | fault <fault-id> | scenarios | run [count]`);
+    throw new Error(`Usage: start | reset | fault <fault-id> | scenarios | run [count] | demo`);
 }

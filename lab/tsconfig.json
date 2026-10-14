@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  },
+  "include": ["core/**/*.ts", "faults/**/*.ts", "runtime/**/*.ts", "services/**/*.ts", "workload-generator/**/*.ts"]
+}

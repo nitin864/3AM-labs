@@ -21,8 +21,11 @@ export class PaymentsService {
   constructor(private readonly telemetry: TelemetryRecorder) {}
 
   charge(request: PaymentRequest, fault?: FaultId): PaymentResult {
-    const durationMs = fault === "timeout-too-short" ? 8 : 3;
-    const ok = fault !== "retry-storm";
+    // The payment operation is intentionally slower than the faulted caller
+    // deadline, but still completes. This creates the observable boundary
+    // mismatch that the timeout experiment is meant to reproduce.
+    const durationMs = fault === "fault-4-timeout-mismatch" ? 220 : 40;
+    const ok = true;
     const spanId = this.telemetry.span({
       traceId: request.traceId,
       service: "payments",

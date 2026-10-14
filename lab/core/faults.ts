@@ -2,7 +2,7 @@ import type { FaultDefinition, FaultId } from "./types.js";
 
 export const FAULT_DEFINITIONS: readonly FaultDefinition[] = [
   {
-    id: "connection-pool-exhaustion",
+    id: "fault-2-pool-exhaustion",
     title: "Connection pool leak / exhaustion",
     description: "Orders retains each acquired database connection until the pool stops admitting requests.",
     service: "orders",
@@ -11,31 +11,31 @@ export const FAULT_DEFINITIONS: readonly FaultDefinition[] = [
     verification: "pool timeouts and request failures return to zero after reset",
   },
   {
-    id: "retry-storm",
-    title: "Retry storm without backoff",
-    description: "A payment failure is retried four times immediately for every order.",
+    id: "fault-4-timeout-mismatch",
+    title: "Timeout shorter than normal downstream latency",
+    description: "The caller timeout is shorter than the legitimate payment latency distribution.",
     service: "orders",
-    groundTruthCause: "unbounded immediate retries amplify a downstream payment failure",
-    expectedSymptoms: ["payment attempts exceed requests", "queue retry count rises", "payment errors"],
-    verification: "payment attempts return to one per request and retry amplification is zero",
+    groundTruthCause: "the payment caller timeout is 150ms while downstream p95 is 220ms",
+    expectedSymptoms: ["caller timeout errors", "downstream operations complete", "latency/error mismatch"],
+    verification: "false timeout failures fall to zero with a 250ms caller timeout",
   },
   {
-    id: "timeout-too-short",
-    title: "Timeout shorter than downstream latency",
-    description: "Orders permits only 3ms while the legitimate payment operation takes 8ms.",
-    service: "orders",
-    groundTruthCause: "caller timeout is shorter than normal payment latency",
-    expectedSymptoms: ["orders timeout errors", "payments complete while caller fails", "elevated p95 latency"],
-    verification: "orders no longer reports false timeouts with the healthy timeout",
-  },
-  {
-    id: "oversell-race",
+    id: "fault-5-oversell-race",
     title: "Oversell race condition",
     description: "Concurrent inventory checks use a stale stock value and all decrement it.",
     service: "inventory",
     groundTruthCause: "inventory check and decrement are not atomic",
     expectedSymptoms: ["available stock becomes negative", "inventory invariant fails", "too many successful orders"],
     verification: "available_stock >= 0 after the concurrent workload",
+  },
+  {
+    id: "fault-6-poison-queue",
+    title: "Poison queue message",
+    description: "An unhandled malformed message blocks the worker from draining valid work.",
+    service: "orders",
+    groundTruthCause: "the worker retries a poison payload without dead-letter handling",
+    expectedSymptoms: ["queue depth remains elevated", "poison retries increase", "valid messages do not drain"],
+    verification: "reset drains valid messages and leaves no poison retry loop",
   },
 ];
 

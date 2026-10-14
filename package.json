@@ -10,8 +10,9 @@
     "node": ">=22.14.0 <23"
   },
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present"
+    "build:lab": "tsc -p lab/tsconfig.json",
+    "build": "npm run build --workspaces --if-present && npm run build:lab",
+    "test": "npm run test --workspaces --if-present && npm run build:lab && node --test tests/verification.test.mjs tests/lab-runtime.test.mjs"
   },
   "devDependencies": {
     "@types/node": "22.10.2",

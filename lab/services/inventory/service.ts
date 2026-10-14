@@ -38,7 +38,7 @@ export class InventoryService {
 
   reserve(request: InventoryRequest, fault?: FaultId): InventoryResult {
     const durationMs = 2;
-    const canReserve = fault === "oversell-race" || this.availableStock >= request.quantity;
+    const canReserve = fault === "fault-5-oversell-race" || this.availableStock >= request.quantity;
     if (canReserve) {
       // The race deliberately models multiple concurrent checks observing the
       // same value. It is deterministic and is never used by healthy mode.

@@ -6,10 +6,10 @@
  */
 
 export type FaultId =
-  | "connection-pool-exhaustion"
-  | "retry-storm"
-  | "timeout-too-short"
-  | "oversell-race";
+  | "fault-2-pool-exhaustion"
+  | "fault-4-timeout-mismatch"
+  | "fault-5-oversell-race"
+  | "fault-6-poison-queue";
 
 export type RequestStatus = "succeeded" | "failed";
 export type SpanStatus = "ok" | "error";
@@ -88,6 +88,7 @@ export interface QueueMetrics {
   processed: number;
   failed: number;
   retryAttempts: number;
+  deadLettered?: number;
 }
 
 export interface InventoryMetrics {

@@ -94,7 +94,7 @@ export class LabRuntime {
     const workload = createWorkload(options);
     // The oversell scenario is intentionally concurrent; make the default
     // stock boundary deterministic and visible without huge workloads.
-    if (this.activeFault === "oversell-race" && workload.requestCount < 80) {
+    if (this.activeFault === "fault-5-oversell-race" && workload.requestCount < 80) {
       const expanded = createWorkload({ count: 80, seed: workload.seed });
       return this.execute(expanded);
     }
@@ -127,6 +127,11 @@ export class LabRuntime {
   private execute(workload: WorkloadManifest): WorkloadResult {
     const runId = `run-${String(++this.runSequence).padStart(6, "0")}`;
     const startedAt = this.telemetry.now();
+    const telemetryOffsets = {
+      logs: this.telemetry.logs.length,
+      spans: this.telemetry.spans.length,
+      faultMarkers: this.telemetry.faultMarkers.length,
+    };
     const outcomes: RequestOutcome[] = [];
     const serviceLatencies: Record<string, number[]> = {
       gateway: [],
@@ -162,12 +167,15 @@ export class LabRuntime {
       outcomes.push(outcome);
       serviceLatencies.gateway?.push(outcome.latencyMs);
       serviceLatencies.orders?.push(Math.max(1, outcome.latencyMs - 1));
-      serviceLatencies.payments?.push(outcome.downstreamAttempts * (this.activeFault === "timeout-too-short" ? 8 : 3));
+      serviceLatencies.payments?.push(outcome.downstreamAttempts * (this.activeFault === "fault-4-timeout-mismatch" ? 220 : 40));
       serviceLatencies.inventory?.push(2);
       if (outcome.status === "failed") {
         serviceFailures.gateway = (serviceFailures.gateway ?? 0) + 1;
         serviceFailures.orders = (serviceFailures.orders ?? 0) + 1;
-        if (outcome.errorType === "payment_declined" || outcome.errorType === "downstream_timeout") {
+        // A timeout mismatch is a caller-side failure: the payment span still
+        // completed successfully and must remain healthy evidence rather than
+        // being mislabeled as a payment error.
+        if (outcome.errorType === "payment_declined") {
           serviceFailures.payments = (serviceFailures.payments ?? 0) + 1;
         }
         if (outcome.errorType === "out_of_stock") {
@@ -180,8 +188,20 @@ export class LabRuntime {
       if (outcome.status === "failed") queue.failed += 1;
       this.telemetry.advance(outcome.latencyMs + 1);
     }
+    if (this.activeFault === "fault-6-poison-queue") {
+      // A poison payload is placed first in the deterministic queue. The
+      // worker retries it and never reaches the valid messages in this run.
+      queue.depth = workload.requestCount;
+      queue.maxDepth = workload.requestCount;
+      queue.enqueued = workload.requestCount;
+      queue.processed = 0;
+      queue.failed = 1;
+      queue.retryAttempts = workload.requestCount;
+      queue.deadLettered = 0;
+    }
     const metrics = buildMetrics({ outcomes, serviceLatencies, serviceFailures, pool: this.pool.metrics(), queue, inventory: this.inventory.metrics() });
     const finishedAt = this.telemetry.now();
+    const telemetry = this.telemetry.snapshot();
     const run: RunResult = {
       runId,
       workload,
@@ -189,8 +209,15 @@ export class LabRuntime {
       finishedAt,
       outcomes,
       metrics,
-      telemetry: this.telemetry.snapshot(),
-      healthy: metrics.errorRate === 0 && metrics.inventory.invariantHolds,
+      // Keep evidence scoped to this replay. The recorder itself remains
+      // cumulative so a caller can inspect the whole incident timeline.
+      telemetry: {
+        logs: telemetry.logs.slice(telemetryOffsets.logs),
+        spans: telemetry.spans.slice(telemetryOffsets.spans),
+        faultMarkers: telemetry.faultMarkers.slice(telemetryOffsets.faultMarkers),
+      },
+      healthy: metrics.errorRate === 0 && metrics.inventory.invariantHolds &&
+        metrics.connectionPool.timeouts === 0 && metrics.queue.depth === 0,
     };
     if (this.activeFault !== undefined) run.faultId = this.activeFault;
     this.persistence.saveRun(run);
