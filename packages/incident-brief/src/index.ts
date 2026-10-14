@@ -217,7 +217,9 @@ function serviceSummaries(run: RunResultLike, baseline?: RunResultLike): Service
       ...(p95 === undefined ? {} : { p95LatencyMs: round(p95) }),
       ...(latencyDelta === undefined ? {} : { latencyDeltaMs: latencyDelta }),
     };
-  });
+  }).sort((a, b) => b.errorCount - a.errorCount
+    || (b.p95LatencyMs ?? 0) - (a.p95LatencyMs ?? 0)
+    || a.service.localeCompare(b.service));
 }
 
 function evidenceForRun(run: RunResultLike): EvidenceReference[] {
