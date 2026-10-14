@@ -1,0 +1,19 @@
+{
+  "name": "@faultline/replica-runner",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build:lab": "tsc -p ../../lab/tsconfig.json",
+    "build": "npm run build:lab && tsc -p tsconfig.json",
+    "test": "npm run build && node --test dist/replica-runner.test.js"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@faultline/experiment-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "npm run build:runner && tsc -p tsconfig.json",
+    "build:runner": "npm --workspace @faultline/replica-runner run build",
+    "test": "npm run build && node --test dist/experiment-engine.test.js"
+  }
+}
