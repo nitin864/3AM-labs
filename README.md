@@ -2,7 +2,7 @@
 
 > Others rank hypotheses. Faultline reproduces them.
 
-Faultline Lab is a controlled incident-investigation prototype. This
+3AM-Labs is a controlled incident-investigation prototype. This
 repository currently provides the reproducibility gate for the first vertical
 slice: a healthy synthetic workload, the deterministic
 `fault-4-timeout-mismatch` symptom, and reset/recovery. It is a lab fixture,
