@@ -1,0 +1,190 @@
+{
+  "schemaVersion": "faultline-benchmark/v1",
+  "benchmarkVersion": "0.1.0",
+  "runConfig": {
+    "scenarioIds": [
+      "fault-4-timeout-mismatch",
+      "fault-5-oversell-race"
+    ],
+    "workloadSeed": 10,
+    "workloadCount": 80,
+    "maxHypotheses": 3,
+    "replicaLimits": {
+      "maxOperations": 500,
+      "timeoutMs": 30000
+    }
+  },
+  "scenarios": [
+    {
+      "scenarioId": "fault-4-timeout-mismatch",
+      "scenarioVersion": "fault-catalog/v1",
+      "trueCause": "the payment caller timeout is 150ms while downstream p95 is 220ms",
+      "workloadId": "workload-10-20",
+      "evidenceDigest": "sha256:01896bf0df3c14e3df0f876bbb387ea26f78009bef8ef4f888472be9f275531c",
+      "graphDigest": "sha256:25a798a344a530529e9445711e3b9cf14bf51992e78c86d9a2222aa15df0bc74",
+      "hypothesisIds": [
+        "incident-fault-4-timeout-mismatch-h3",
+        "incident-fault-4-timeout-mismatch-h2",
+        "incident-fault-4-timeout-mismatch-h1"
+      ],
+      "modeA": {
+        "rankedHypothesisIds": [
+          "incident-fault-4-timeout-mismatch-h3",
+          "incident-fault-4-timeout-mismatch-h2",
+          "incident-fault-4-timeout-mismatch-h1"
+        ],
+        "top1Correct": true,
+        "top3Recall": true,
+        "candidateCount": 3,
+        "experimentCount": 0,
+        "tokenUsage": 14407,
+        "resourceUsage": "Not measured"
+      },
+      "modeB": {
+        "hypothesisResults": [
+          {
+            "id": "experiment-fault-4-timeout-mismatch-incident-fault-4-timeout-mismatch-h3",
+            "hypothesisId": "incident-fault-4-timeout-mismatch-h3",
+            "classification": "supported",
+            "status": "passed",
+            "rationale": "treatment reproduced the predicted measured symptom and reset removed it"
+          },
+          {
+            "id": "experiment-fault-4-timeout-mismatch-incident-fault-4-timeout-mismatch-h2",
+            "hypothesisId": "incident-fault-4-timeout-mismatch-h2",
+            "classification": "rejected",
+            "status": "failed",
+            "rationale": "valid controlled treatment contradicted the predicted symptom"
+          },
+          {
+            "id": "experiment-fault-4-timeout-mismatch-incident-fault-4-timeout-mismatch-h1",
+            "hypothesisId": "incident-fault-4-timeout-mismatch-h1",
+            "classification": "inconclusive",
+            "status": "inconclusive",
+            "rationale": "control and treatment measurements did not discriminate the hypothesis"
+          }
+        ],
+        "supportedCauseCorrect": true,
+        "falseSupportCount": 0,
+        "rejectedCount": 1,
+        "inconclusiveCount": 1,
+        "inconclusiveRate": 0.333333,
+        "verifiedFixRate": "Not measured",
+        "timeToDiagnosis": 14382,
+        "timeToVerifiedFix": "Not measured",
+        "experimentCount": 3,
+        "tokenUsage": 14407,
+        "resourceUsage": "Not measured"
+      },
+      "top1_accuracy": true,
+      "top3_recall": true,
+      "supported_cause_correct": true,
+      "false_support_count": 0,
+      "inconclusive_rate": 0.333333,
+      "verified_fix_rate": "Not measured",
+      "time_to_diagnosis": 14382,
+      "time_to_verified_fix": "Not measured",
+      "experiment_count": 3,
+      "token_usage": 14407,
+      "resource_usage": "Not measured"
+    },
+    {
+      "scenarioId": "fault-5-oversell-race",
+      "scenarioVersion": "fault-catalog/v1",
+      "trueCause": "inventory check and decrement are not atomic",
+      "workloadId": "workload-10-80",
+      "evidenceDigest": "sha256:8ab34224cc94d373ca8be123b9b322ea7aac731b0069376cd782c83d8598d01b",
+      "graphDigest": "sha256:2af9287fbc75db2c893e0b87b680fb3b81995e217c5bc377b521546c8519552d",
+      "hypothesisIds": [
+        "incident-fault-5-oversell-race-h3",
+        "incident-fault-5-oversell-race-h2",
+        "incident-fault-5-oversell-race-h1"
+      ],
+      "modeA": {
+        "rankedHypothesisIds": [
+          "incident-fault-5-oversell-race-h3",
+          "incident-fault-5-oversell-race-h2",
+          "incident-fault-5-oversell-race-h1"
+        ],
+        "top1Correct": true,
+        "top3Recall": true,
+        "candidateCount": 3,
+        "experimentCount": 0,
+        "tokenUsage": 52640,
+        "resourceUsage": "Not measured"
+      },
+      "modeB": {
+        "hypothesisResults": [
+          {
+            "id": "experiment-fault-5-oversell-race-incident-fault-5-oversell-race-h3",
+            "hypothesisId": "incident-fault-5-oversell-race-h3",
+            "classification": "supported",
+            "status": "passed",
+            "rationale": "treatment reproduced the predicted measured symptom and reset removed it"
+          },
+          {
+            "id": "experiment-fault-5-oversell-race-incident-fault-5-oversell-race-h2",
+            "hypothesisId": "incident-fault-5-oversell-race-h2",
+            "classification": "rejected",
+            "status": "failed",
+            "rationale": "valid controlled treatment contradicted the predicted symptom"
+          },
+          {
+            "id": "experiment-fault-5-oversell-race-incident-fault-5-oversell-race-h1",
+            "hypothesisId": "incident-fault-5-oversell-race-h1",
+            "classification": "inconclusive",
+            "status": "inconclusive",
+            "rationale": "control and treatment measurements did not discriminate the hypothesis"
+          }
+        ],
+        "supportedCauseCorrect": true,
+        "falseSupportCount": 0,
+        "rejectedCount": 1,
+        "inconclusiveCount": 1,
+        "inconclusiveRate": 0.333333,
+        "verifiedFixRate": "Not measured",
+        "timeToDiagnosis": 31782,
+        "timeToVerifiedFix": "Not measured",
+        "experimentCount": 3,
+        "tokenUsage": 52640,
+        "resourceUsage": "Not measured"
+      },
+      "top1_accuracy": true,
+      "top3_recall": true,
+      "supported_cause_correct": true,
+      "false_support_count": 0,
+      "inconclusive_rate": 0.333333,
+      "verified_fix_rate": "Not measured",
+      "time_to_diagnosis": 31782,
+      "time_to_verified_fix": "Not measured",
+      "experiment_count": 3,
+      "token_usage": 52640,
+      "resource_usage": "Not measured"
+    }
+  ],
+  "aggregate": {
+    "top1_accuracy": 1,
+    "top3_recall": 1,
+    "supported_cause_correct": 1,
+    "false_support_count": 0,
+    "inconclusive_rate": 0.333333,
+    "verified_fix_rate": "Not measured",
+    "time_to_diagnosis": 23082,
+    "time_to_verified_fix": "Not measured",
+    "experiment_count": 6,
+    "token_usage": 67047,
+    "resource_usage": "Not measured",
+    "modeA": {
+      "top1_accuracy": 1,
+      "top3_recall": 1,
+      "token_usage": 67047
+    },
+    "modeB": {
+      "supported_cause_correct": 1,
+      "false_support_count": 0,
+      "inconclusive_rate": 0.333333,
+      "experiment_count": 6,
+      "token_usage": 67047
+    }
+  }
+}

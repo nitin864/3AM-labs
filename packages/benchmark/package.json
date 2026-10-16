@@ -1,0 +1,20 @@
+{
+  "name": "@faultline/benchmark",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build:deps": "npm run build:lab --prefix ../.. && npm --prefix ../.. run build --workspace @faultline/contracts --if-present && npm --prefix ../.. run build --workspace @faultline/incident-brief --if-present && npm --prefix ../.. run build --workspace @faultline/graph-builder --if-present && npm --prefix ../.. run build --workspace @faultline/agent-orchestrator --if-present && npm --prefix ../.. run build --workspace @faultline/replica-runner --if-present && npm --prefix ../.. run build --workspace @faultline/experiment-engine --if-present",
+    "build": "npm run build:deps && tsc -p tsconfig.json",
+    "test": "npm run build && node --test dist/benchmark.test.js",
+    "benchmark": "npm run build && node dist/cli.js --out ../../artifacts/benchmark/result.json"
+  }
+}
