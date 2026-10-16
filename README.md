@@ -1,4 +1,4 @@
-# Faultline Lab
+# 3AM-Labs
 
 > Others rank hypotheses. Faultline reproduces them.
 
