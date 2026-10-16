@@ -1,8 +1,8 @@
-# 3AM-Labs
+# Faultline Lab
 
-> **Others rank hypotheses. 3AM reproduces them.**
+> **Others rank hypotheses. Faultline reproduces them.**
 
-3AM-labs is an open-source, experimental developer tool for incident
+Faultline Lab is an open-source, experimental developer tool for incident
 diagnosis through controlled reproduction. It runs a small, deterministic,
 in-memory service model, injects documented faults, collects structured
 telemetry, and evaluates hypotheses against control/treatment/after runs.
