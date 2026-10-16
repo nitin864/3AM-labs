@@ -21,7 +21,7 @@ No database, Docker daemon, network access, API key, or OmniRush account is
 needed for the offline verification gate.
 
 ```sh
-git clone <repository-url> faultline-lab
+git clone https://github.com/nitin864/3AM-labs 3AM-labs
 cd faultline-lab
 nvm use                         # reads .nvmrc; install Node 22 first if needed
 make setup                      # npm ci --offline, then a local-only check
